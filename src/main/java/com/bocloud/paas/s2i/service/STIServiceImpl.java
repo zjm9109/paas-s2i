@@ -3,7 +3,11 @@ package com.bocloud.paas.s2i.service;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
+import com.bocloud.paas.s2i.util.FileUtil;
 
 /**
  * s2i服务类
@@ -14,6 +18,12 @@ import org.springframework.stereotype.Service;
 @Service("STIService")
 public class STIServiceImpl {
 
+	private static final Logger logger = LoggerFactory.getLogger(STIServiceImpl.class);
+	/**
+	 * s2i存放结果文件主路径
+	 */
+	private static final String STI_HOME = "/opt/s2i_home";
+	
 	/**
 	 * 构建s2i镜像
 	 * 
@@ -39,9 +49,9 @@ public class STIServiceImpl {
 		command.append(" -e INCREMENTAL=true --incremental ").append(repositoryUrl);
 		command.append(" ").append(baseImage).append(" ").append(newImage);
 		command.append(" -r ").append(repositoryBranch);
-		System.out.println("——————————————————————————————————> s2i build command: " + command.toString());
+		logger.info("——————————————————————————————————> s2i build command: " + command.toString());
 		try {
-			System.out.println("——————————————————————————————————> start execute s2i build...");
+			logger.info("——————————————————————————————————> start execute s2i build...");
 			Process ps = Runtime.getRuntime().exec(command.toString());  
 			  
             BufferedReader br = new BufferedReader(new InputStreamReader(ps.getInputStream()));  
@@ -50,9 +60,15 @@ public class STIServiceImpl {
             while ((line = br.readLine()) != null) {  
                 result.append(line).append("\n");  
             }  
-			System.out.println("——————————————————————————————————> execute s2i build success: \n" + result);
+            // 将构建镜像的结果保存在文件中
+            String fileName = newImage + Long.toString(System.currentTimeMillis() / 1000);
+            fileName = STI_HOME + "/build/" + fileName;
+            logger.info("——————————————————————————————————> execute s2i build success: \n" + result);
+            if (!FileUtil.createFile(fileName, result.toString())) {
+            	logger.warn("——————————————————————————————————> save the build result fail to the " + fileName + " fail！");
+            }
 		} catch (Exception e) {
-			System.out.println("——————————————————————————————————> execute s2i build fail: \n" + e);
+			logger.error("——————————————————————————————————> execute s2i build fail: \n" + e);
 		}
 	}
 }
