@@ -1,5 +1,5 @@
-/** <a href="http://www.cpupk.com/decompiler">Eclipse Class Decompiler</a> plugin, Copyright (c) 2017 Chen Chao. */
-package com.bocloud.common.ssh;
+package com.bocloud.paas.s2i.util;
+
 import java.io.IOException;
 import java.net.SocketException;
 
@@ -16,7 +16,6 @@ import ch.ethz.ssh2.SCPClient;
 import ch.ethz.ssh2.SFTPv3Client;
 import ch.ethz.ssh2.Session;
 import ch.ethz.ssh2.StreamGobbler;
-
 /**
  * SSH客户端
  * 
