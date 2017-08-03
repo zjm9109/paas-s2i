@@ -23,6 +23,10 @@ public class STIServiceImpl {
 	 */
 	private static final String STI_HOME = "/opt/s2i_home/";
 	/**
+	 * s2i存放脚本文件主路径
+	 */
+	private static final String STI_SHELL = "/opt/s2i_shell/";
+	/**
 	 * s2i构建脚本的文件名
 	 */
 	private static final String BUILD_SH_NAME = "build.sh";
@@ -48,7 +52,7 @@ public class STIServiceImpl {
 	public void build(String baseImage, String repositoryUrl, String repositoryBranch, String repositoryUsername,
 			String repositoryPassword, String warName, String newImage) {
 		StringBuffer command = new StringBuffer();
-		command.append("sh ").append(STI_HOME).append("shell/").append(BUILD_SH_NAME).append(" ");
+		command.append("sh ").append(STI_SHELL).append("/").append(BUILD_SH_NAME).append(" ");
 		command.append(warName).append(" ").append(repositoryUrl).append(" ").append(baseImage);
 		command.append(" ").append(newImage).append(" ").append(repositoryBranch);
 		logger.info("——————————————————————————————————> s2i build command: " + command.toString());
