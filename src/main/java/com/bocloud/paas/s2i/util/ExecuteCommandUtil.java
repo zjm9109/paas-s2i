@@ -16,7 +16,8 @@ public class ExecuteCommandUtil {
 		try {
 			logger.info("——————————————————————————————————> start execute [" + command + "]...");
 			ps = Runtime.getRuntime().exec(command.toString());
-			int code = ps.waitFor();
+			ps.waitFor();
+			int code = ps.exitValue();
 			// 方法阻塞, 等待命令执行完成（成功会返回0）
 			if (code == 0) {
 				br = new BufferedReader(new InputStreamReader(ps.getInputStream(), "UTF-8"));
@@ -42,5 +43,6 @@ public class ExecuteCommandUtil {
             }
 		}
 		return result;
+		
 	}
 }

@@ -30,7 +30,7 @@ public class STIServiceImpl {
 	 * s2i构建脚本的文件名
 	 */
 	private static final String BUILD_SH_NAME = "build.sh";
-	
+
 	/**
 	 * 构建s2i镜像
 	 * 
@@ -56,24 +56,26 @@ public class STIServiceImpl {
 		command.append(warName).append(" ").append(repositoryUrl).append(" ").append(baseImage);
 		command.append(" ").append(newImage).append(" ").append(repositoryBranch);
 		logger.info("——————————————————————————————————> s2i build command: " + command.toString());
-		
+
 		Result result = ExecuteCommandUtil.exec(command.toString());
 		if (result.getCode() == 0) {
-        	logger.info("——————————————————————————————————> execute s2i build success: \n" + result.getMessage());
-        } else {
-        	logger.error("——————————————————————————————————> execute s2i build fail: \n" + result.getMessage());
-        }
+			logger.info("——————————————————————————————————> execute s2i build success: \n" + result.getMessage());
+		} else {
+			logger.error("——————————————————————————————————> execute s2i build fail: \n" + result.getMessage());
+		}
 		if (result.isSuccess()) {
 			// 将构建镜像的结果保存在文件中
-	        newImage = newImage.lastIndexOf("/") > 0 ? newImage.substring(newImage.lastIndexOf("/")) : newImage;
-	        newImage = newImage.lastIndexOf(":") > 0 ? newImage.replace(":", "_") : newImage;
-	        String fileName = newImage + "-" + Long.toString(System.currentTimeMillis() / 1000);
-	        fileName = STI_HOME + "build/" + fileName;
+			newImage = newImage.lastIndexOf("/") > 0 ? newImage.substring(newImage.lastIndexOf("/")) : newImage;
+			newImage = newImage.lastIndexOf(":") > 0 ? newImage.replace(":", "_") : newImage;
+			String fileName = newImage + "-" + Long.toString(System.currentTimeMillis() / 1000);
+			fileName = STI_HOME + "build/" + fileName;
 
-	        if (!FileUtil.createFile(fileName, result.getMessage())) {
-	        	logger.warn("——————————————————————————————————> save the build result fail to the [" + fileName + "] fail！");
-	        }
+			if (!FileUtil.createFile(fileName, result.getMessage())) {
+				logger.warn("——————————————————————————————————> save the build result fail to the [" + fileName
+						+ "] fail！");
+			}
 		}
-		
+
 	}
+
 }
