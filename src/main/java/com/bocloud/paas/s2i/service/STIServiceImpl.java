@@ -22,7 +22,11 @@ public class STIServiceImpl {
 	/**
 	 * s2i存放结果文件主路径
 	 */
-	private static final String STI_HOME = "/opt/s2i_home";
+	private static final String STI_HOME = "/opt/s2i_home/";
+	/**
+	 * s2i构建脚本的文件名
+	 */
+	private static final String BUILD_SH_NAME = "build.sh";
 	
 	/**
 	 * 构建s2i镜像
@@ -45,10 +49,9 @@ public class STIServiceImpl {
 	public void build(String baseImage, String repositoryUrl, String repositoryBranch, String repositoryUsername,
 			String repositoryPassword, String warName, String newImage) {
 		StringBuffer command = new StringBuffer();
-		command.append("s2i build -e PROFILE=docker -e WAR_NAME=").append(warName);
-		command.append(" -e INCREMENTAL=true --incremental ").append(repositoryUrl);
-		command.append(" ").append(baseImage).append(" ").append(newImage);
-		command.append(" -r ").append(repositoryBranch);
+		command.append("sh ").append(STI_HOME).append("shell/").append(BUILD_SH_NAME);
+		command.append(warName).append(" ").append(repositoryUrl).append(" ").append(baseImage);
+		command.append(" ").append(newImage).append(" ").append(repositoryBranch);
 		logger.info("——————————————————————————————————> s2i build command: " + command.toString());
 		try {
 			logger.info("——————————————————————————————————> start execute s2i build...");
@@ -61,8 +64,10 @@ public class STIServiceImpl {
                 result.append(line).append("\n");  
             }  
             // 将构建镜像的结果保存在文件中
-            String fileName = newImage + Long.toString(System.currentTimeMillis() / 1000);
-            fileName = STI_HOME + "/build/" + fileName;
+            newImage = newImage.lastIndexOf("/") > 0 ? newImage.substring(newImage.lastIndexOf("/")) : newImage;
+            newImage = newImage.lastIndexOf(":") > 0 ? newImage.replace(":", "_") : newImage;
+            String fileName = newImage + "-" + Long.toString(System.currentTimeMillis() / 1000);
+            fileName = STI_HOME + "build/" + fileName;
             logger.info("——————————————————————————————————> execute s2i build success: \n" + result);
             if (!FileUtil.createFile(fileName, result.toString())) {
             	logger.warn("——————————————————————————————————> save the build result fail to the " + fileName + " fail！");
