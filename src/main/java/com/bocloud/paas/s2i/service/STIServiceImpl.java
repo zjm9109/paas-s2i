@@ -66,7 +66,7 @@ public class STIServiceImpl {
 	        String fileName = newImage + "-" + Long.toString(System.currentTimeMillis() / 1000);
 	        fileName = STI_HOME + "build/" + fileName;
 
-	        if (!FileUtil.createFile(fileName, result.toString())) {
+	        if (!FileUtil.createFile(fileName, result.getMessage())) {
 	        	logger.warn("——————————————————————————————————> save the build result fail to the [" + fileName + "] fail！");
 	        }
 		}
