@@ -53,11 +53,18 @@ public class STIServiceImpl {
 		command.append(warName).append(" ").append(repositoryUrl).append(" ").append(baseImage);
 		command.append(" ").append(newImage).append(" ").append(repositoryBranch);
 		logger.info("——————————————————————————————————> s2i build command: " + command.toString());
+		Process ps = null;
+		BufferedReader br = null;
 		try {
 			logger.info("——————————————————————————————————> start execute s2i build...");
-			Process ps = Runtime.getRuntime().exec(command.toString());  
-			  
-            BufferedReader br = new BufferedReader(new InputStreamReader(ps.getInputStream()));  
+			ps = Runtime.getRuntime().exec(command.toString());
+			int code = ps.waitFor();
+			// 方法阻塞, 等待命令执行完成（成功会返回0）
+			if (code == 0) {
+				br = new BufferedReader(new InputStreamReader(ps.getInputStream(), "UTF-8"));
+			} else {
+				br = new BufferedReader(new InputStreamReader(ps.getErrorStream(), "UTF-8"));
+			}
             StringBuffer result = new StringBuffer();  
             String line;  
             while ((line = br.readLine()) != null) {  
@@ -68,12 +75,23 @@ public class STIServiceImpl {
             newImage = newImage.lastIndexOf(":") > 0 ? newImage.replace(":", "_") : newImage;
             String fileName = newImage + "-" + Long.toString(System.currentTimeMillis() / 1000);
             fileName = STI_HOME + "build/" + fileName;
-            logger.info("——————————————————————————————————> execute s2i build success: \n" + result);
+            if (code == 0) {
+            	logger.info("——————————————————————————————————> execute s2i build success: \n" + result);
+            } else {
+            	logger.error("——————————————————————————————————> execute s2i build fail: \n" + result);
+            }
             if (!FileUtil.createFile(fileName, result.toString())) {
             	logger.warn("——————————————————————————————————> save the build result fail to the " + fileName + " fail！");
             }
 		} catch (Exception e) {
 			logger.error("——————————————————————————————————> execute s2i build fail: \n" + e);
+		} finally {
+			FileUtil.closeStream(br);
+
+            // 销毁子进程
+            if (ps != null) {
+                ps.destroy();
+            }
 		}
 	}
 }

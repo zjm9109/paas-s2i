@@ -2,6 +2,7 @@ package com.bocloud.paas.s2i.util;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -157,5 +158,19 @@ public class FileUtil {
 		}
 
 	}
+	
+	/**
+	 * 关闭文件流
+	 * @param stream
+	 */
+	public static void closeStream(Closeable stream) {
+        if (stream != null) {
+            try {
+                stream.close();
+            } catch (Exception e) {
+            	logger.error("stream close fail：", e);
+            }
+        }
+    }
 
 }
