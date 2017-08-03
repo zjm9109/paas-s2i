@@ -49,7 +49,7 @@ public class STIServiceImpl {
 	public void build(String baseImage, String repositoryUrl, String repositoryBranch, String repositoryUsername,
 			String repositoryPassword, String warName, String newImage) {
 		StringBuffer command = new StringBuffer();
-		command.append("sh ").append(STI_HOME).append("shell/").append(BUILD_SH_NAME);
+		command.append("sh ").append(STI_HOME).append("shell/").append(BUILD_SH_NAME).append(" ");
 		command.append(warName).append(" ").append(repositoryUrl).append(" ").append(baseImage);
 		command.append(" ").append(newImage).append(" ").append(repositoryBranch);
 		logger.info("——————————————————————————————————> s2i build command: " + command.toString());
