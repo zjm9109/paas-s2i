@@ -5,7 +5,7 @@ RUN tar zxvf /opt/source-to-image-v1.1.7-226afa1-linux-amd64.tar.gz -C /usr/bin
 
 RUN mkdir -p /opt/workspace /opt/s2i_home/shell/
 COPY target/bocloud.paas.s2i-0.0.1-SNAPSHOT.jar /opt/workspace
-COPY shell/* /opt/s2i_home/shell/
+COPY shell/build.sh /opt/s2i_home/shell/
 
 EXPOSE 8080
 WORKDIR /opt/workspace
