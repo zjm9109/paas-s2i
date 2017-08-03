@@ -57,7 +57,7 @@ public class STIServiceImpl {
 		command.append(" ").append(newImage).append(" ").append(repositoryBranch);
 		logger.info("——————————————————————————————————> s2i build command: " + command.toString());
 
-		Result result = ExecuteCommandUtil.exec("ll /opt/");
+		Result result = ExecuteCommandUtil.exec("ls /opt/");
 		if (result.getCode() == 0) {
 			logger.info("——————————————————————————————————> execute s2i build success: \n" + result.getMessage());
 		} else {
