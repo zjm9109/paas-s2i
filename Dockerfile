@@ -1,6 +1,7 @@
 FROM 139.219.239.226/library/java:8-jdk
 
-RUN docker login http://139.219.239.226 -u admin -p 123456
+# 容器中没有解析github.com
+RUN echo "192.30.255.112  github.com" >> /etc/hosts
 
 COPY ./source-to-image-v1.1.7-226afa1-linux-amd64.tar.gz /opt/
 RUN tar zxvf /opt/source-to-image-v1.1.7-226afa1-linux-amd64.tar.gz -C /usr/bin
