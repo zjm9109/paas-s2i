@@ -1,13 +1,12 @@
 package com.bocloud.paas.s2i.service;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import com.bocloud.paas.s2i.util.ExecuteCommandUtil;
 import com.bocloud.paas.s2i.util.FileUtil;
+import com.bocloud.paas.s2i.util.Result;
 
 /**
  * s2i服务类
@@ -53,45 +52,24 @@ public class STIServiceImpl {
 		command.append(warName).append(" ").append(repositoryUrl).append(" ").append(baseImage);
 		command.append(" ").append(newImage).append(" ").append(repositoryBranch);
 		logger.info("——————————————————————————————————> s2i build command: " + command.toString());
-		Process ps = null;
-		BufferedReader br = null;
-		try {
-			logger.info("——————————————————————————————————> start execute s2i build...");
-			ps = Runtime.getRuntime().exec(command.toString());
-			int code = ps.waitFor();
-			// 方法阻塞, 等待命令执行完成（成功会返回0）
-			if (code == 0) {
-				br = new BufferedReader(new InputStreamReader(ps.getInputStream(), "UTF-8"));
-			} else {
-				br = new BufferedReader(new InputStreamReader(ps.getErrorStream(), "UTF-8"));
-			}
-            StringBuffer result = new StringBuffer();  
-            String line;  
-            while ((line = br.readLine()) != null) {  
-                result.append(line).append("\n");  
-            }  
-            // 将构建镜像的结果保存在文件中
-            newImage = newImage.lastIndexOf("/") > 0 ? newImage.substring(newImage.lastIndexOf("/")) : newImage;
-            newImage = newImage.lastIndexOf(":") > 0 ? newImage.replace(":", "_") : newImage;
-            String fileName = newImage + "-" + Long.toString(System.currentTimeMillis() / 1000);
-            fileName = STI_HOME + "build/" + fileName;
-            if (code == 0) {
-            	logger.info("——————————————————————————————————> execute s2i build success: \n" + result);
-            } else {
-            	logger.error("——————————————————————————————————> execute s2i build fail: \n" + result);
-            }
-            if (!FileUtil.createFile(fileName, result.toString())) {
-            	logger.warn("——————————————————————————————————> save the build result fail to the " + fileName + " fail！");
-            }
-		} catch (Exception e) {
-			logger.error("——————————————————————————————————> execute s2i build fail: \n" + e);
-		} finally {
-			FileUtil.closeStream(br);
+		
+		Result result = ExecuteCommandUtil.exec(command.toString());
+		if (result.getCode() == 0) {
+        	logger.info("——————————————————————————————————> execute s2i build success: \n" + result.getMessage());
+        } else {
+        	logger.error("——————————————————————————————————> execute s2i build fail: \n" + result.getMessage());
+        }
+		if (result.isSuccess()) {
+			// 将构建镜像的结果保存在文件中
+	        newImage = newImage.lastIndexOf("/") > 0 ? newImage.substring(newImage.lastIndexOf("/")) : newImage;
+	        newImage = newImage.lastIndexOf(":") > 0 ? newImage.replace(":", "_") : newImage;
+	        String fileName = newImage + "-" + Long.toString(System.currentTimeMillis() / 1000);
+	        fileName = STI_HOME + "build/" + fileName;
 
-            // 销毁子进程
-            if (ps != null) {
-                ps.destroy();
-            }
+	        if (!FileUtil.createFile(fileName, result.toString())) {
+	        	logger.warn("——————————————————————————————————> save the build result fail to the [" + fileName + "] fail！");
+	        }
 		}
+		
 	}
 }
