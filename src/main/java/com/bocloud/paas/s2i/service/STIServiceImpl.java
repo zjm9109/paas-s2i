@@ -57,6 +57,7 @@ public class STIServiceImpl {
 		String shPath = "/Users/zjm/work/workspace-git/pass-s2i/pass-s2i/shell/build.sh";
 		String[] command = {"sh", shPath, warName, repositoryUrl, baseImage, newImage, repositoryBranch};
 		try {
+			logger.info(Test.execute(command));
 			System.out.println(Test.execute(command));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
