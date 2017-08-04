@@ -16,7 +16,7 @@ public class ExecuteCommandUtil {
 		String cmd = "";
 		try {
 			for (String command : commands) {
-				cmd += command + "";
+				cmd += command + " ";
 			}
 			logger.info("——————————————————————————————————> start execute [" + cmd + "]...");
 			ps = Runtime.getRuntime().exec(commands);
