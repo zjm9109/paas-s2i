@@ -9,13 +9,17 @@ import org.slf4j.LoggerFactory;
 public class ExecuteCommandUtil {
 	private static final Logger logger = LoggerFactory.getLogger(ExecuteCommandUtil.class);
 	
-	public static Result exec(String command) {
+	public static Result exec(String[] commands) {
 		Result result = new Result(false, "");
 		Process ps = null;
 		BufferedReader br = null;
+		String cmd = "";
 		try {
-			logger.info("——————————————————————————————————> start execute [" + command + "]...");
-			ps = Runtime.getRuntime().exec(command.toString());
+			for (String command : commands) {
+				cmd += command + "";
+			}
+			logger.info("——————————————————————————————————> start execute [" + cmd + "]...");
+			ps = Runtime.getRuntime().exec(commands);
 			ps.waitFor();
 			int code = ps.exitValue();
 			// 方法阻塞, 等待命令执行完成（成功会返回0）
@@ -34,7 +38,7 @@ public class ExecuteCommandUtil {
             result.setMessage(execResult.toString());
 		} catch (Exception e) {
 			logger.error("——————————————————————————————————> execute [" 
-					+ command + "] fail: \n" + e);
+					+ cmd + "] fail: \n" + e);
 		} finally {
 			FileUtil.closeStream(br);
             // 销毁子进程
@@ -43,6 +47,5 @@ public class ExecuteCommandUtil {
             }
 		}
 		return result;
-		
 	}
 }

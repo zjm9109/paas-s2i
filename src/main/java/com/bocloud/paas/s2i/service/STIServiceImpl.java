@@ -51,13 +51,10 @@ public class STIServiceImpl {
 	 */
 	public void build(String baseImage, String repositoryUrl, String repositoryBranch, String repositoryUsername,
 			String repositoryPassword, String warName, String newImage) {
-		StringBuffer command = new StringBuffer();
-		command.append("sh ").append(STI_SHELL).append(BUILD_SH_NAME).append(" ");
-		command.append(warName).append(" ").append(repositoryUrl).append(" ").append(baseImage);
-		command.append(" ").append(newImage).append(" ").append(repositoryBranch);
-		logger.info("——————————————————————————————————> s2i build command: " + command.toString());
+		String shPath = STI_SHELL + BUILD_SH_NAME;
+		String[] command = {"sh", shPath, warName, repositoryUrl, baseImage, newImage, repositoryBranch};
 
-		Result result = ExecuteCommandUtil.exec("ls /opt/");
+		Result result = ExecuteCommandUtil.exec(command);
 		if (result.getCode() == 0) {
 			logger.info("——————————————————————————————————> execute s2i build success: \n" + result.getMessage());
 		} else {
