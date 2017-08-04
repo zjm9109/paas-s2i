@@ -66,7 +66,6 @@ public class ExecuteCommandUtil {
 				String line = null;
 				try {
 					while ((line = bf.readLine()) != null) {
-						logger.info(line);
 						execResult.append(line).append("\n");
 					}
 				} catch (IOException e) {
