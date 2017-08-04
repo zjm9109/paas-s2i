@@ -55,9 +55,9 @@ public class STIServiceImpl {
 		String[] command = {"sh", shPath, warName, repositoryUrl, baseImage, newImage, repositoryBranch};
 				Result result = ExecuteCommandUtil.exec(command);
 		if (result.getCode() == 0) {
-			logger.info("——————————————————————————————————> execute s2i build success: \n" + result.getMessage());
+			logger.info("——————————————————————————————————> execute s2i build success!");
 		} else {
-			logger.error("——————————————————————————————————> execute s2i build fail: \n" + result.getMessage());
+			logger.error("——————————————————————————————————> execute s2i build fail!");
 		}
 		if (result.isSuccess()) {
 			// 将构建镜像的结果保存在文件中
