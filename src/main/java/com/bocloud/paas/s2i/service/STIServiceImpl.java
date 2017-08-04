@@ -53,7 +53,7 @@ public class STIServiceImpl {
 			String repositoryPassword, String warName, String newImage) {
 		String shPath = STI_SHELL + BUILD_SH_NAME;
 		// String[] command = {"sh", shPath, warName, repositoryUrl, baseImage, newImage, repositoryBranch};
-		String [] command = {"sh", "/opt/docker_build.sh", "build", "-t", "qwer", "."};
+		String [] command = {"sh", "/opt/docker_build.sh", "build", "-t", "qwer", "/opt/s2i_shell"};
 		Result result = ExecuteCommandUtil.exec(command);
 		if (result.getCode() == 0) {
 			logger.info("——————————————————————————————————> execute s2i build success: \n" + result.getMessage());
