@@ -5,6 +5,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,12 +27,16 @@ public class ExecuteCommandUtil {
 			}
 			logger.info("——————————————————————————————————> start execute [" + cmd + "]...");
 			ps = Runtime.getRuntime().exec(commands);
-			printMessage(ps.getInputStream());
-			printMessage(ps.getErrorStream());
+			String isMessage = getResult(ps.getInputStream());
+			String esMssage = getResult(ps.getErrorStream());
 			int value = ps.waitFor();
 			result.setSuccess(true);
 			result.setCode(value);
-			result.setMessage("");
+			if (value == 0) {
+				result.setMessage(isMessage);
+			} else {
+				result.setMessage(esMssage);
+			}
 		} catch (Exception e) {
 			logger.error("——————————————————————————————————> execute [" + cmd + "] fail: \n" + e);
 		} finally {
@@ -40,22 +48,41 @@ public class ExecuteCommandUtil {
 		}
 		return result;
 	}
-
-	private static void printMessage(final InputStream input) {
-		new Thread(new Runnable() {
-			public void run() {
-		    	Reader reader = new InputStreamReader(input);
-		        BufferedReader bf = new BufferedReader(reader);
-		        String line = null;
-		        try {
-		        	while((line=bf.readLine())!=null) {
-						logger.info(line);
-		            }
-		        } catch (IOException e) {
-		        	e.printStackTrace();
-		        }
+	
+	/**
+	 * 获取输出结果
+	 * @param input
+	 * @return
+	 */
+	private static String getResult(final InputStream input) {
+		String result = "";
+		ExecutorService executorService = Executors.newCachedThreadPool();
+		Callable<String> callable = new Callable<String>() {
+			@Override
+			public String call() throws Exception {
+				StringBuffer execResult = new StringBuffer();
+				Reader reader = new InputStreamReader(input);
+				BufferedReader bf = new BufferedReader(reader);
+				String line = null;
+				try {
+					while ((line = bf.readLine()) != null) {
+						execResult.append(line).append("\n");
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				return execResult.toString();
 			}
-	    }).start();
+		};
+		Future<String> future = executorService.submit(callable);
+		try {
+			if (future.isDone()) {
+				result = future.get();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return result;
 	}
 
 }
