@@ -72,17 +72,20 @@ public class ExecuteCommandUtil {
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
+				logger.info("call里面执行的～～～～～～～～～～～～～～～～" + execResult.toString());
 				return execResult.toString();
 			}
 		};
 		Future<String> future = executorService.submit(callable);
 		try {
+			logger.info("getResult里面执行的～～～～～～～～～～～～～～～～" + future.get());
 			if (future.isDone()) {
 				result = future.get();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
 		return result;
 	}
 
