@@ -56,16 +56,6 @@ public class STIServiceImpl {
 			String repositoryPassword, String warName, String newImage) {
 		String shPath = "/Users/zjm/work/workspace-git/pass-s2i/pass-s2i/shell/build.sh";
 		String[] command = {"sh", shPath, warName, repositoryUrl, baseImage, newImage, repositoryBranch};
-		try {
-			logger.info(Test.execute(command));
-			System.out.println(Test.execute(command));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		//		Result result = ExecuteCommandUtil.exec(command);
 //		if (result.getCode() == 0) {
 //			logger.info("——————————————————————————————————> execute s2i build success: \n" + result.getMessage());

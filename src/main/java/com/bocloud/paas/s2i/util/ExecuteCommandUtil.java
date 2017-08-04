@@ -1,6 +1,7 @@
 package com.bocloud.paas.s2i.util;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -22,22 +23,12 @@ public class ExecuteCommandUtil {
 			}
 			logger.info("——————————————————————————————————> start execute [" + cmd + "]...");
 			ps = Runtime.getRuntime().exec(commands);
-			ps.waitFor();
-			int code = ps.exitValue();
-			// 方法阻塞, 等待命令执行完成（成功会返回0）
-			if (code == 0) {
-				br = getResult(ps.getInputStream());
-			} else {
-				br = getResult(ps.getErrorStream());
-			}
-			StringBuffer execResult = new StringBuffer();
-			String line;
-			while ((line = br.readLine()) != null) {
-				execResult.append(line).append("\n");
-			}
+			printMessage(ps.getInputStream());
+			printMessage(ps.getErrorStream());
+			int value = ps.waitFor();
 			result.setSuccess(true);
-			result.setCode(code);
-			result.setMessage(execResult.toString());
+			result.setCode(value);
+			result.setMessage("");
 		} catch (Exception e) {
 			logger.error("——————————————————————————————————> execute [" + cmd + "] fail: \n" + e);
 		} finally {
@@ -50,25 +41,21 @@ public class ExecuteCommandUtil {
 		return result;
 	}
 
-	public static BufferedReader getResult(final InputStream input) {
-		StringBuffer execResult = new StringBuffer();
-		new Thread (new Runnable()  {
-			@Override
+	private static void printMessage(final InputStream input) {
+		new Thread(new Runnable() {
 			public void run() {
-				try {
-					Reader reader = new InputStreamReader(input, "UTF-8");
-					BufferedReader bf = new BufferedReader(reader);
-					String line = null;
-					while ((line = bf.readLine()) != null) {
-						execResult.append(line).append("\n");
-					}
-				} catch (Exception e) {
-					logger.error("get result fail: \n", e);
-				}
+		    	Reader reader = new InputStreamReader(input);
+		        BufferedReader bf = new BufferedReader(reader);
+		        String line = null;
+		        try {
+		        	while((line=bf.readLine())!=null) {
+						logger.info(line);
+		            }
+		        } catch (IOException e) {
+		        	e.printStackTrace();
+		        }
 			}
-		}).start();
-
-		return null;
+	    }).start();
 	}
 
 }
