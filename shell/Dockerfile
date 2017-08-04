@@ -7,7 +7,6 @@ COPY target/bocloud.paas.s2i-0.0.1-SNAPSHOT.jar /opt/workspace/
 COPY shell/ /opt/s2i_shell/
 
 COPY docker_build.sh /opt/
-COPY Dockerfiler /opt/workspace
 
 EXPOSE 8080
 WORKDIR /opt/workspace
