@@ -56,7 +56,7 @@ public class STIServiceImpl {
 	public void build(String baseImage, String repositoryUrl, String repositoryBranch, String repositoryUsername,
 			String repositoryPassword, String warName, String newImage) {
 		String shPath = STI_SHELL + BUILD_SH_NAME;
-		String[] command = {SH_COMMAND, "-c", shPath, warName, repositoryUrl, baseImage, newImage, repositoryBranch};
+		String[] command = {"sh", shPath, warName, repositoryUrl, baseImage, newImage, repositoryBranch};
 				Result result = ExecuteCommandUtil.exec(command);
 		if (result.getCode() == 0) {
 			logger.info("——————————————————————————————————> execute s2i build success!");

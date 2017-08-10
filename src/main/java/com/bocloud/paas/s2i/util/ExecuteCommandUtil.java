@@ -58,7 +58,7 @@ public class ExecuteCommandUtil {
 				String line = null;
 				try {
 					while((line=bf.readLine())!=null) {
-						System.out.println(line);
+						logger.info(line);
 					}
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
