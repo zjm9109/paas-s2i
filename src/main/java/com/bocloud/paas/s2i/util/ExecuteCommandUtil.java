@@ -27,16 +27,11 @@ public class ExecuteCommandUtil {
 			}
 			logger.info("——————————————————————————————————> start execute [" + cmd + "]...");
 			ps = Runtime.getRuntime().exec(commands);
-			String isMessage = getResult(ps.getInputStream());
-			String esMssage = getResult(ps.getErrorStream());
+			getResult(ps.getInputStream());
+			getResult(ps.getErrorStream());
 			int value = ps.waitFor();
 			result.setSuccess(true);
 			result.setCode(value);
-			if (value == 0) {
-				result.setMessage(isMessage);
-			} else {
-				result.setMessage(esMssage);
-			}
 		} catch (Exception e) {
 			logger.error("——————————————————————————————————> execute [" + cmd + "] fail: \n" + e);
 		} finally {
@@ -54,42 +49,59 @@ public class ExecuteCommandUtil {
 	 * @param input
 	 * @return
 	 */
-	private static String getResult(final InputStream input) {
-		String result = "";
-		ExecutorService executorService = Executors.newCachedThreadPool();
-		Callable<String> callable = new Callable<String>() {
+	private static void getResult(final InputStream input) {
+		new Thread(new Runnable() {
 			@Override
-			public String call() throws Exception {
-				StringBuffer execResult = new StringBuffer();
+			public void run() {
 				Reader reader = new InputStreamReader(input);
 				BufferedReader bf = new BufferedReader(reader);
 				String line = null;
 				try {
-					while ((line = bf.readLine()) != null) {
-						logger.info(line);
-						execResult.append(line).append("\n");
+					while((line=bf.readLine())!=null) {
+						System.out.println(line);
 					}
 				} catch (IOException e) {
-					logger.error("get result exec error:\n", e);
-				} finally {
-					FileUtil.closeStream(bf);
-					reader.close();
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
-				logger.info("call里面执行的～～～～～～～～～～～～～～～～" + execResult.toString());
-				return execResult.toString();
 			}
-		};
-		Future<String> future = executorService.submit(callable);
-		try {
-			logger.info("getResult里面执行的～～～～～～～～～～～～～～～～" + future.get());
-			if (future.isDone()) {
-				result = future.get();
-			}
-		} catch (Exception e) {
-			logger.error("get result exec error:\n", e);
-		}
-		
-		return result;
+
+		}).start();
+		//		String result = "";
+//		ExecutorService executorService = Executors.newCachedThreadPool();
+//		Callable<String> callable = new Callable<String>() {
+//			@Override
+//			public String call() throws Exception {
+//				StringBuffer execResult = new StringBuffer();
+//				Reader reader = new InputStreamReader(input);
+//				BufferedReader bf = new BufferedReader(reader);
+//				String line = null;
+//				try {
+//					while ((line = bf.readLine()) != null) {
+//						logger.info(line);
+//						execResult.append(line).append("\n");
+//					}
+//				} catch (IOException e) {
+//					logger.error("get result exec error:\n", e);
+//				} finally {
+//					FileUtil.closeStream(bf);
+//					reader.close();
+//				}
+//				logger.info("call里面执行的～～～～～～～～～～～～～～～～" + execResult.toString());
+//				return execResult.toString();
+//			}
+//		};
+//		Future<String> future = executorService.submit(callable);
+//		try {
+//			logger.info("getResult里面执行的～～～～～～～～～～～～～～～～" + future.get());
+//			if (future.isDone()) {
+//				result = future.get();
+//			}
+//		} catch (Exception e) {
+//			logger.error("get result exec error:\n", e);
+//		}
+//		
+//		return result;
 	}
 
 }
