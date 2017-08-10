@@ -91,7 +91,7 @@ public class FileUtil {
 		// 判断目标文件所在的目录是否存在
 		if (!file.getParentFile().exists()) {
 			if (!file.getParentFile().mkdirs()) {
-				logger.error("创建目标文件所在目录失败！");
+				logger.error("创建目标文件[" + fileName + "]所在目录失败！");
 				return false;
 			}
 		}
@@ -101,10 +101,10 @@ public class FileUtil {
 			writer.write(content);
 			writer.close();
 		} catch (IOException e) {
-			logger.error("文件内容写入失败: ", e);
+			logger.error("文件[" + fileName + "]内容写入失败: ", e);
 			return false;
 		}
-		logger.info("文件内容写入成功！");
+		logger.info("文件[" + fileName + "]内容写入成功！");
 		return true;
 	}
 

@@ -70,7 +70,10 @@ public class ExecuteCommandUtil {
 						execResult.append(line).append("\n");
 					}
 				} catch (IOException e) {
-					e.printStackTrace();
+					logger.error("get result exec error:\n", e);
+				} finally {
+					FileUtil.closeStream(bf);
+					reader.close();
 				}
 				logger.info("call里面执行的～～～～～～～～～～～～～～～～" + execResult.toString());
 				return execResult.toString();
@@ -83,7 +86,7 @@ public class ExecuteCommandUtil {
 				result = future.get();
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("get result exec error:\n", e);
 		}
 		
 		return result;
