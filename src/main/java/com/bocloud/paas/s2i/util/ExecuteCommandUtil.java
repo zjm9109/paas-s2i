@@ -54,7 +54,7 @@ public class ExecuteCommandUtil {
 				StringBuffer execResult = new StringBuffer();
 				try {
 					while ((line = bf.readLine()) != null) {
-						logger.info(line);
+						// logger.info(line);
 						execResult.append(line).append("\n");
 					}
 					if (!FileUtil.createFile(fileName, execResult.toString())) {
