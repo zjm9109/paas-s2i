@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.bocloud.paas.s2i.util.ExecuteCommandUtil;
-import com.bocloud.paas.s2i.util.FileUtil;
 import com.bocloud.paas.s2i.util.Result;
 
 /**
@@ -30,10 +29,6 @@ public class STIServiceImpl {
 	 * s2i构建脚本的文件名
 	 */
 	private static final String BUILD_SH_NAME = "build.sh";
-	/**
-	 * sh的命令地址
-	 */
-	private static final String SH_COMMAND = "/bin/sh";
 
 	/**
 	 * 构建s2i镜像
@@ -57,23 +52,17 @@ public class STIServiceImpl {
 			String repositoryPassword, String warName, String newImage) {
 		String shPath = STI_SHELL + BUILD_SH_NAME;
 		String[] command = {"sh", shPath, warName, repositoryUrl, baseImage, newImage, repositoryBranch};
-				Result result = ExecuteCommandUtil.exec(command);
+		// 设置存储构建记录的文件名
+		newImage = newImage.lastIndexOf("/") > 0 ? newImage.substring(newImage.lastIndexOf("/")) : newImage;
+		newImage = newImage.lastIndexOf(":") > 0 ? newImage.replace(":", "_") : newImage;
+		String fileName = newImage + "-" + Long.toString(System.currentTimeMillis() / 1000);
+		fileName = STI_HOME + "build/" + fileName;
+		
+		Result result = ExecuteCommandUtil.exec(command, fileName);
 		if (result.getCode() == 0) {
 			logger.info("——————————————————————————————————> execute s2i build success!");
 		} else {
 			logger.error("——————————————————————————————————> execute s2i build fail!");
-		}
-		if (result.isSuccess()) {
-			// 将构建镜像的结果保存在文件中
-			newImage = newImage.lastIndexOf("/") > 0 ? newImage.substring(newImage.lastIndexOf("/")) : newImage;
-			newImage = newImage.lastIndexOf(":") > 0 ? newImage.replace(":", "_") : newImage;
-			String fileName = newImage + "-" + Long.toString(System.currentTimeMillis() / 1000);
-			fileName = STI_HOME + "build/" + fileName;
-
-			if (!FileUtil.createFile(fileName, result.getMessage())) {
-				logger.warn("——————————————————————————————————> save the build result fail to the [" + fileName
-						+ "] fail！");
-			}
 		}
 
 	}

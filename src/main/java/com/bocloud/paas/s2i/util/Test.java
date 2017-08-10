@@ -15,11 +15,11 @@ import org.slf4j.LoggerFactory;
 
 //用两个线程来分别获取标准输出流和错误输出流,否则会造成io阻塞导致程序卡死
 public class Test {
-
+	
 	private static final Logger logger = LoggerFactory.getLogger(Test.class);
 
 	public static void main(String[] args) throws IOException, InterruptedException {
-		String[] cmd = { "/usr/local/bin/docker", "pull", "java" };
+		String[] cmd = {"/usr/local/bin/docker", "pull", "java"};
 		final Process process = Runtime.getRuntime().exec(cmd);
 		printMessage(process.getInputStream());
 		printMessage(process.getErrorStream());
@@ -27,23 +27,36 @@ public class Test {
 		System.out.println(value);
 	}
 
-	private static void printMessage(final InputStream input) {
-		new Thread(new Runnable() {
+	private static String printMessage(final InputStream input) {
+		String result = "";
+		ExecutorService executorService = Executors.newCachedThreadPool();
+		Callable<String> callable = new Callable<String>() {
 			@Override
-			public void run() {
+			public String call() throws Exception {
+				StringBuffer execResult = new StringBuffer();
 				Reader reader = new InputStreamReader(input);
 				BufferedReader bf = new BufferedReader(reader);
 				String line = null;
 				try {
-					while((line=bf.readLine())!=null) {
-						System.out.println(line);
+					while ((line = bf.readLine()) != null) {
+						logger.info(line);
+						execResult.append(line).append("\n");
 					}
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+				return execResult.toString();
 			}
-
-		}).start();
+		};
+		Future<String> future = executorService.submit(callable);
+		try {
+			if (future.isDone()) {
+				result = future.get();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return result;
 	}
 }
