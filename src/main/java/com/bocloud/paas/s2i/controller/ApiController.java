@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bocloud.paas.s2i.service.STIServiceImpl;
+import com.bocloud.paas.s2i.util.Result;
 
 @RestController
 @RequestMapping("/api")
@@ -33,9 +34,9 @@ public class ApiController {
 	 *            构建后的镜像名称
 	 */
 	@RequestMapping(value = "/build", method = { RequestMethod.GET })
-	public void build(String baseImage, String repositoryUrl, String repositoryBranch, String repositoryUsername,
+	public Result build(String baseImage, String repositoryUrl, String repositoryBranch, String repositoryUsername,
 			String repositoryPassword, String warName, String newImage) {
-		stiService.build(baseImage, repositoryUrl, repositoryBranch, repositoryUsername, repositoryPassword, warName,
+		return stiService.build(baseImage, repositoryUrl, repositoryBranch, repositoryUsername, repositoryPassword, warName,
 				newImage);
 	}
 }

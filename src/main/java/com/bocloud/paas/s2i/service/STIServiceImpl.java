@@ -48,7 +48,7 @@ public class STIServiceImpl {
 	 * @param newImage
 	 *            构建后的镜像名称
 	 */
-	public void build(String baseImage, String repositoryUrl, String repositoryBranch, String repositoryUsername,
+	public Result build(String baseImage, String repositoryUrl, String repositoryBranch, String repositoryUsername,
 			String repositoryPassword, String warName, String newImage) {
 		String shPath = STI_SHELL + BUILD_SH_NAME;
 		String[] command = {"sh", shPath, warName, repositoryUrl, baseImage, newImage, repositoryBranch};
@@ -60,11 +60,13 @@ public class STIServiceImpl {
 		
 		Result result = ExecuteCommandUtil.exec(command, fileName);
 		if (result.getCode() == 0) {
-			logger.info("——————————————————————————————————> execute s2i build success!");
+			result.setMessage("execute s2i build image [" + newImage + "] success!");
+			logger.info("——————————————————————————————————> " + result.getMessage());
 		} else {
-			logger.error("——————————————————————————————————> execute s2i build fail!");
+			result.setMessage("execute s2i build image [" + newImage + "] fail!");
+			logger.error("——————————————————————————————————> " + result.getMessage());
 		}
-
+		return result;
 	}
 
 }
