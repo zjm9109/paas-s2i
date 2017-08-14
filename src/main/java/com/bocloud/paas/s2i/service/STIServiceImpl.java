@@ -1,5 +1,6 @@
 package com.bocloud.paas.s2i.service;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -51,7 +52,18 @@ public class STIServiceImpl {
 	public Result build(String baseImage, String repositoryUrl, String repositoryBranch, String repositoryUsername,
 			String repositoryPassword, String warName, String newImage) {
 		String shPath = STI_SHELL + BUILD_SH_NAME;
-		String[] command = {"sh", shPath, warName, repositoryUrl, baseImage, newImage, repositoryBranch};
+		String sourceUrl = repositoryUrl;
+		if (StringUtils.isNotBlank(repositoryUsername) && StringUtils.isNotBlank(repositoryPassword)) {
+			// 转义源码的用户名密码的@
+			repositoryUsername = repositoryUsername.replace("@", "%40");
+			repositoryPassword = repositoryPassword.replace("@", "%40");
+			
+			// TODO 拼接源码地址账户密码和地址，待优化
+			sourceUrl = "https://" + repositoryUsername + ":" + repositoryPassword + "@"
+			    + repositoryUrl.substring(repositoryUrl.indexOf("https://"));
+		}
+		
+		String[] command = {"sh", shPath, warName, sourceUrl, baseImage, newImage, repositoryBranch};
 		// 设置存储构建记录的文件名
 		newImage = newImage.lastIndexOf("/") > 0 ? newImage.substring(newImage.lastIndexOf("/")) : newImage;
 		newImage = newImage.lastIndexOf(":") > 0 ? newImage.replace(":", "_") : newImage;
@@ -68,5 +80,5 @@ public class STIServiceImpl {
 		}
 		return result;
 	}
-
+	
 }
